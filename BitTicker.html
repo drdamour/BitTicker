@@ -86,7 +86,7 @@
 			this.ResetTimer = function()
 			{
 				window.clearInterval(coundownTimer);
-				coundownTimer = countdown( self.RefreshTime, (new Date()).valueOf()+10000); //updates refresh time observable
+				coundownTimer = countdown( self.RefreshTime, (new Date()).valueOf()+ (30*1000)); //updates refresh time observable
 			};
 			self.ResetTimer();
 
