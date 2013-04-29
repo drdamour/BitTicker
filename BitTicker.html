@@ -1,0 +1,121 @@
+<html>
+	<head>
+		<title>Hello World!</title>
+		<script src="knockout-2.2.1.js"></script>
+		<script src="countdown.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+
+		<style>
+
+			.align-top-right
+			{
+				position: absolute;
+				right: 0px;
+				top: 0px; 
+			}
+
+			.align-bottom-right
+			{
+				position: absolute;
+				right: 0px;
+				bottom: 0px; 
+			}
+
+			body
+			{
+				margin-top: 10px;
+				-webkit-app-region: drag;
+				background-color: #E3E3E3;
+			}
+
+			button,a
+			{
+				-webkit-app-region: no-drag;
+			}
+		</style>
+	</head>
+	<body class="text-center"> 
+		<button class="align-top-right btn btn-link" style="padding: 0px;" data-bind="click: close"><i class="icon-remove"></i></button>
+		<div class="align-bottom-right" >
+			Courtesy of <a target="_blank" data-bind="click: OpenBTTicker" href="http://btcticker.appspot.com/">btcticker</a>
+		</div>
+
+		<img style="width: 80%" src="img/bitcoin.png"></img>
+
+		<img style="height: 28px" data-bind="attr: { src : RateURL}"></img>
+
+		<button class="btn btn-success" data-bind="click: Refresh">
+			<i class="icon-refresh"></i>
+			<span data-bind="text: RefreshIn"></span>
+		</button>
+		
+	</body>
+
+	<script>
+
+    	function BitCoinTickerVM()
+    	{
+    		var self = this;
+
+			var gui = require('nw.gui');
+    		var win = gui.Window.get();
+    		var i = 0;
+    		this.close = function()
+			{
+				win.close();
+			}
+
+			this.Refresh = function()
+			{
+				self.RateURL("http://btcticker.appspot.com/mtgox/1btc2usd.png?r=" + ++i);
+				self.ResetTimer();
+			}
+
+			this.OpenBTTicker = function(item)
+			{
+				gui.Shell.openExternal( "http://btcticker.appspot.com/" );
+				return false;
+			}
+
+			this.RateURL = ko.observable("http://btcticker.appspot.com/mtgox/1btc2usd.png?r=" + i);
+
+			this.RefreshTime = ko.observable(null);
+			var coundownTimer = null;
+
+			this.ResetTimer = function()
+			{
+				window.clearInterval(coundownTimer);
+				coundownTimer = countdown( self.RefreshTime, (new Date()).valueOf()+10000); //updates refresh time observable
+			};
+			self.ResetTimer();
+
+
+			this.RefreshIn = ko.computed( 
+				function()
+				{
+					if(self.RefreshTime() == null)
+					{
+						return "";
+					}
+					return "Refresh (" + self.RefreshTime().toString() + ")";
+				}
+
+			);
+
+			this.RefreshTime.subscribe(
+				function(timespan)
+				{
+					if(timespan.value < 0)
+					{
+						self.Refresh(); 
+					}
+				}
+			);
+			
+
+    	}
+		
+		ko.applyBindings( new BitCoinTickerVM() );
+	</script>
+</html>
